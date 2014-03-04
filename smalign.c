@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define MAXCOL	100
 #define MAXSEQ  1000
@@ -127,6 +128,7 @@ char mss (int d, int l, int u) {
 
 }
 
+/* revers a string: used for the last step of back tracing */
 void revseq (char seq[]) {
 
 	int		i;                               // index for seq and revseq
@@ -223,6 +225,76 @@ void smalign (char seq1[], char seq2[], char bts1[], char bts2[]) {
 
 }
 
+/* format alignment output */
+void print_align (char aln1[], char aln2[]) {
+
+	int		i,l;                             // index and length for alignment
+	int		j, k, m, n;                      // vars for format control
+
+	l = strlen( aln1 );
+
+	char	aln[ l ];                        // the one line alignment string
+
+	if ( l != strlen( aln2 ) ) {
+	
+		printf("Error, seq1 and seq2 are not equal in length!\n");
+		exit(1);
+	
+	}
+
+	// get the alignment string
+	for ( i = 0; i < l; i++ ) {
+
+		if ( aln1[i] == aln2[i] ) {
+			aln[i] = ':';
+		} else if ( aln1[i] == '-' || aln2[i] == '-' ) {
+			aln[i] = ' ';
+		} else {
+			aln[i] = '.';
+		}
+	
+	}
+	
+	aln[i] = '\0';
+	
+	// output alignment header
+	printf("1        10        20        30        40        50\n");
+	printf("....:....|....:....|....:....|....:....|....:....|\n\n");
+
+
+	// format output
+	m = l;
+	n = 0;
+	for ( i = 0; i < l; i = i + 50 ) {
+		// decide the length of the char to print
+		if ( m > 50 ) {
+			k = 50;
+		} else {
+			k = m % 50;
+		}
+		// print seqs/aliment
+		// seq1
+		for ( j = 0; j < k; j++ ) {
+			printf("%c", aln1[i+j]);
+		}
+		printf("\n");
+		// alingment
+		for ( j = 0; j < k; j++ ) {
+			printf("%c", aln[i+j]);
+		}
+		printf("\n");
+		// seq2
+		for ( j = 0; j < k; j++ ) {
+			printf("%c", aln2[i+j]);
+		}
+		printf("\n\n");
+		// recal controls
+		m = m - 50;
+		n++;
+	}
+
+}
+
 int main ( int argc, char *argv[] ) {
 
 	char	seq1[ MAXSEQ ];                  // input seq1
@@ -242,11 +314,7 @@ int main ( int argc, char *argv[] ) {
 
 	smalign( seq1, seq2, bts1, bts2 );
 
-	printf("orignal sequence:\n");
-	puts(seq1);
-	puts(seq2);
-	printf("smith-waterman alignment\n");
-	puts(bts1);
-	puts(bts2);
+	printf("Smith-Waterman Alignment:\n\n");
+	print_align(bts1, bts2);
 
 }
