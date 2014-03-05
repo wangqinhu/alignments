@@ -3,14 +3,14 @@ Under development
 
 DONE
 ----
-- read fasta sequence
+- read fasta function 
 - smith-waterman align function
-- format output
+- format output function
+- input/out control
 
 TODO
 ----
-- add some control options
-
+- nwalign.c
 
 Clone & Compile
 ---------------

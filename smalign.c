@@ -12,14 +12,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
 
-#define MAXCOL	100
-#define MAXSEQ  1000
+#define MAXCOL     120                 // max column each line
+#define MAXSEQ     1000                // max sequene length
+#define MAXFNL     256                 // max filename length
+#define MATCH      4                   // match score
+#define MISMATCH  -3                   // mismatch score
+#define GAP       -4                   // gap score
 
 void usage() {
 	
 	printf("usage:\n\n");
-	printf("./smalign fasta1 fasta2\n\n");
+	printf("smalign <options>\n\n");
+	printf("  -h  help\n");
+	printf("  -i  input sequence file 1\n");
+	printf("  -j  input sequence file 2\n");
+	printf("  -a  input sequence a, directly in command line\n");
+	printf("  -b  input sequence b, directly in command line\n");
+	printf("  -s  output the raw alignment\n\n");
 	exit(1);
 
 }
@@ -27,7 +38,8 @@ void usage() {
 /* define nucleotude */
 int isnuc (char nuc) {
 
-	switch (nuc) {
+	switch ( nuc ) {
+
 		case 'A': return 1;
 		case 'C': return 1;
 		case 'G': return 1;
@@ -39,6 +51,7 @@ int isnuc (char nuc) {
 		case 't': return 1;
 		case 'u': return 1;
 		default:  return 0;
+
 	}
 
 }
@@ -82,20 +95,15 @@ void readseq (char filename[], char seq[]) {
 int score (char a, char b) {
 	
 	int		score;                              // final score
-    int		match, mismatch, gap;               // award scores
-
-	match = 4;
-	mismatch = -3;
-	gap = -4;
 
 	if ( a == '-' || b == '-' )
-		score = gap;
+		score = GAP;
 	else
-		score = ( a == b ) ? match : mismatch;
+		score = ( a == b ) ? MATCH : MISMATCH;
 	
 	return score;
 
-}
+} // end score
 
 /* max3: return the max score */
 int max3 (int d, int l, int u) {
@@ -109,7 +117,7 @@ int max3 (int d, int l, int u) {
 
 	return max;
 	
-} 
+} // end max3
 
 /* mss: return the max score source */
 char mss (int d, int l, int u) {
@@ -126,7 +134,7 @@ char mss (int d, int l, int u) {
 
 	return mss;
 
-}
+} // end of mss
 
 /* revers a string: used for the last step of back tracing */
 void revseq (char seq[]) {
@@ -144,10 +152,41 @@ void revseq (char seq[]) {
 		seq[i] = hold[l-1-i]; 
 	}
 
-}
+} // end of revseq
+
+/* get the alignment string */
+void align_str (char aln1[], char aln2[], char aln[]) {
+
+	int		i,l;                             // index and length for alignment
+
+	l = strlen( aln1 );
+
+	if ( l != strlen( aln2 ) ) {
+	
+		printf("Error, seq1 and seq2 are not equal in length!\n");
+		exit(1);
+	
+	}
+
+	// get the alignment string
+	for ( i = 0; i < l; i++ ) {
+
+		if ( aln1[i] == aln2[i] ) {
+			aln[i] = ':';
+		} else if ( aln1[i] == '-' || aln2[i] == '-' ) {
+			aln[i] = ' ';
+		} else {
+			aln[i] = '.';
+		}
+	
+	}
+	
+	aln[i] = '\0';
+
+} // end of align_str
 
 /* smith-waterman alignment function */
-void smalign (char seq1[], char seq2[], char bts1[], char bts2[]) {
+int smalign (char seq1[], char seq2[], char bts1[], char bts2[], char aln[]) {
 
 	int		mat[ MAXSEQ + 1 ][ MAXSEQ + 1 ]; // score matrix
 	int		i, j;                            // matrix indices
@@ -183,11 +222,13 @@ void smalign (char seq1[], char seq2[], char bts1[], char bts2[]) {
 
 	/* back trace  */
 
+	/*
 	// print the back trace matrix
-	//for ( i = 0; i <= m; i++ ) {
-	//	for ( j = 0; j <= n; j++ ) printf("%2d %c\t", mat[i][j], btm[i][j]);
-	//	printf("\n");
-	//}
+	for ( i = 0; i <= m; i++ ) {
+		for ( j = 0; j <= n; j++ ) printf("%2d %c\t", mat[i][j], btm[i][j]);
+		printf("\n");
+	}
+	*/
 	
 	// find max element and its indices
 	me = 0;
@@ -220,47 +261,27 @@ void smalign (char seq1[], char seq2[], char bts1[], char bts2[]) {
 			bts2[bi] = '\0';
 			revseq(bts1);
 			revseq(bts2);
-			return;
+			break;
 		}
 
-}
+	// get aligment string
+	align_str( bts1, bts2, aln );
+	
+	return me;
+
+} // end of smalign
 
 /* format alignment output */
-void print_align (char aln1[], char aln2[]) {
+void print_align (char aln1[], char aln2[], char aln[]) {
 
 	int		i,l;                             // index and length for alignment
 	int		j, k, m, n;                      // vars for format control
 
 	l = strlen( aln1 );
 
-	char	aln[ l ];                        // the one line alignment string
-
-	if ( l != strlen( aln2 ) ) {
-	
-		printf("Error, seq1 and seq2 are not equal in length!\n");
-		exit(1);
-	
-	}
-
-	// get the alignment string
-	for ( i = 0; i < l; i++ ) {
-
-		if ( aln1[i] == aln2[i] ) {
-			aln[i] = ':';
-		} else if ( aln1[i] == '-' || aln2[i] == '-' ) {
-			aln[i] = ' ';
-		} else {
-			aln[i] = '.';
-		}
-	
-	}
-	
-	aln[i] = '\0';
-	
 	// output alignment header
 	printf("1        10        20        30        40        50\n");
 	printf("....:....|....:....|....:....|....:....|....:....|\n\n");
-
 
 	// format output
 	m = l;
@@ -293,28 +314,79 @@ void print_align (char aln1[], char aln2[]) {
 		n++;
 	}
 
-}
+} // end of print_align
 
-int main ( int argc, char *argv[] ) {
+int main (int argc, char *argv[]) {
 
 	char	seq1[ MAXSEQ ];                  // input seq1
 	char	seq2[ MAXSEQ ];                  // input seq2
 	char	bts1[ MAXSEQ ];                  // back trace seq1
 	char	bts2[ MAXSEQ ];                  // back trace seq2
-   
-	if ( argc != 3 ) {
+	char	aln[ MAXSEQ ];                   // the one line alignment string
+	int		smas;                            // smith-waterman alginment score
+	int		c;                               // options
+	char	infile1[ MAXFNL ];               // input file1
+	char	infile2[ MAXFNL ];               // input file2
+	int		simple;                          // output controls
 
-		printf("Error: insufficent arguments\n");
+	// options
+	while ( ( c = getopt( argc, argv, "ha:b:i:j:s" )  ) != EOF )
+		
+		switch (c) {
+			case 'h':
+				usage();
+				break;
+			case 'a':
+				strcpy(seq1, optarg);
+				break;
+			case 'b':
+				strcpy(seq2, optarg);
+				break;
+			case 'i':
+				strcpy(infile1, optarg);
+				break;
+			case 'j':
+				strcpy(infile2, optarg);
+				break;
+			case 's':
+				simple = 1;
+				break;
+
+		}
+
+	// check if sequences were passed by file
+	if ( ( infile1[0] != '\0' ) && ( infile2[0] != '\0' ) ) {
+
+		readseq( infile1, seq1 );
+		readseq( infile2, seq2 );
+
+	}
+
+	// check if sequences are ready
+	if ( ( seq1[0] == '\0' ) || ( seq2[0] == '\0' ) ) {
+
+		printf("Error: no input sequences found!\n");
 		usage();
 
 	}
 
-	readseq( argv[1], seq1 );
-	readseq( argv[2], seq2 );
+	// do smith-waterman alignment
+	smas = smalign( seq1, seq2, bts1, bts2, aln );
 
-	smalign( seq1, seq2, bts1, bts2 );
+	// output alignment
+	if ( simple == 1 ) {
 
-	printf("Smith-Waterman Alignment:\n\n");
-	print_align(bts1, bts2);
+		printf("%d\n", smas);
+		puts(bts1);
+		puts(aln);
+		puts(bts2);
+
+	} else { 
+
+		printf("Smith-Waterman Alignment:\n\n");
+		printf("Score:\t%d\n\n", smas);
+		print_align( bts1, bts2, aln );
+	
+	}
 
 }
