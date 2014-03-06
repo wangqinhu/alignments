@@ -1,2 +1,6 @@
-smalign
-data/
+swalign
+nwalign
+!data/seq1.fa
+!data/seq2.fa
+!data/seq3.fa
+!data/seq4.fa

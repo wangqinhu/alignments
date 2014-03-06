@@ -23,14 +23,19 @@
 
 void usage() {
 	
+	printf("\nSimith-Waterman Alignment\n\n");
 	printf("usage:\n\n");
-	printf("smalign <options>\n\n");
+	printf("swalign <options>\n\n");
 	printf("  -h  help\n");
 	printf("  -i  input sequence file 1\n");
 	printf("  -j  input sequence file 2\n");
 	printf("  -a  input sequence a, directly in command line\n");
 	printf("  -b  input sequence b, directly in command line\n");
 	printf("  -s  output the raw alignment\n\n");
+	printf("________________________________________________\n");
+	printf("Wang, Qinhu\n");
+	printf("wangqinhu@nwafu.edu.cn\n");
+	printf("https://github.com/wangqinhu/alignments\n");
 	exit(1);
 
 }
@@ -64,7 +69,7 @@ void readseq (char filename[], char seq[]) {
 	char	line[ MAXCOL ];                  // store each line
 	int		j;                               // index for line[]
 
-	file = fopen( filename, "r");
+	file = fopen( filename, "r" );
 
 	if ( file == NULL ) {
 
@@ -186,7 +191,7 @@ void align_str (char aln1[], char aln2[], char aln[]) {
 } // end of align_str
 
 /* smith-waterman alignment function */
-int smalign (char seq1[], char seq2[], char bts1[], char bts2[], char aln[]) {
+int swalign (char seq1[], char seq2[], char bts1[], char bts2[], char aln[]) {
 
 	int		mat[ MAXSEQ + 1 ][ MAXSEQ + 1 ]; // score matrix
 	int		i, j;                            // matrix indices
@@ -194,7 +199,7 @@ int smalign (char seq1[], char seq2[], char bts1[], char bts2[], char aln[]) {
 	char	btm[ MAXSEQ + 1 ][ MAXSEQ + 1 ]; // back trace mark
 	int		d, u, l;                         // source score
 	int		me, mi, mj;                      // max element and its indices
-	char	bi;                              // back trace index, forward
+	int		bi;                              // back trace index, forward
 
 	/* initialization the matrix */
 	m = strlen( seq1 );
@@ -269,7 +274,7 @@ int smalign (char seq1[], char seq2[], char bts1[], char bts2[], char aln[]) {
 	
 	return me;
 
-} // end of smalign
+} // end of swalign
 
 /* format alignment output */
 void print_align (char aln1[], char aln2[], char aln[]) {
@@ -323,7 +328,7 @@ int main (int argc, char *argv[]) {
 	char	bts1[ MAXSEQ ];                  // back trace seq1
 	char	bts2[ MAXSEQ ];                  // back trace seq2
 	char	aln[ MAXSEQ ];                   // the one line alignment string
-	int		smas;                            // smith-waterman alginment score
+	int		swas;                            // smith-waterman alginment score
 	int		c;                               // options
 	char	infile1[ MAXFNL ];               // input file1
 	char	infile2[ MAXFNL ];               // input file2
@@ -371,12 +376,12 @@ int main (int argc, char *argv[]) {
 	}
 
 	// do smith-waterman alignment
-	smas = smalign( seq1, seq2, bts1, bts2, aln );
+	swas = swalign( seq1, seq2, bts1, bts2, aln );
 
 	// output alignment
 	if ( simple == 1 ) {
 
-		printf("%d\n", smas);
+		printf("%d\n", swas);
 		puts(bts1);
 		puts(aln);
 		puts(bts2);
@@ -384,7 +389,7 @@ int main (int argc, char *argv[]) {
 	} else { 
 
 		printf("Smith-Waterman Alignment:\n\n");
-		printf("Score:\t%d\n\n", smas);
+		printf("Score:\t%d\n\n", swas);
 		print_align( bts1, bts2, aln );
 	
 	}
