@@ -355,6 +355,12 @@ int main (int argc, char *argv[]) {
 
 		}
 
+	if ( argc == 1 ) {
+	
+		usage();
+
+	}
+
 	// check if sequences were passed by file
 	if ( ( infile1[0] != '\0' ) && ( infile2[0] != '\0' ) ) {
 
@@ -366,7 +372,7 @@ int main (int argc, char *argv[]) {
 	// check if sequences are ready
 	if ( ( seq1[0] == '\0' ) || ( seq2[0] == '\0' ) ) {
 
-		printf("Error: no input sequences found!\n");
+		printf("Error: insufficent input sequences found!\n");
 		usage();
 
 	}
