@@ -168,7 +168,7 @@ void revseq (char seq[]) {
 	
 	strcpy(hold, seq);
 
-	for ( i = 0; i < l - 1; i++ ) {
+	for ( i = 0; i < l; i++ ) {
 		seq[i] = hold[l-1-i]; 
 	}
 
@@ -177,7 +177,7 @@ void revseq (char seq[]) {
 /* get the alignment string */
 void align_str (char aln1[], char aln2[], char aln[]) {
 
-	int		i,l;                             // index and length for alignment
+	int		i, l;                            // index and length for alignment
 
 	l = strlen( aln1 );
 
