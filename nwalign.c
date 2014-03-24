@@ -13,6 +13,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #define MAXCOL     120                 // max column each line
 #define MAXSEQ     1000                // max sequene length
@@ -57,6 +58,20 @@ int isnuc (char nuc) {
 		case 'u': return 1;
 		default:  return 0;
 
+	}
+
+}
+
+/* convert seq to UPPER case */
+void upper (char seq[]) {
+
+	int		i;
+
+	i = 0;
+
+	while ( seq[i] != '\0' ) {
+		seq[i] = toupper( seq[i]);
+		i++;
 	}
 
 }
@@ -376,6 +391,10 @@ int main (int argc, char *argv[]) {
 		usage();
 
 	}
+
+	// covert sequences to UPPER case
+	upper( seq1 );
+	upper( seq2 );
 
 	// do needleman-wunsch alignment
 	nwas = nwalign( seq1, seq2, bts1, bts2, aln );

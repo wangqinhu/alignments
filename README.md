@@ -1,17 +1,14 @@
-Under development
------------------
+Alignments
+==========
 
-DONE
-----
-- read fasta function 
-- smith-waterman align function
-- format output function
+Basic nucleotide sequences alignment tools implemented in C for biologist.
+
+Features
+---------
+- read fasta sequence 
+- smith-waterman alignment
+- needleman-wunsch alignment
 - input/out control
-- needleman-wunsch align function
-
-TODO
-----
-perhaps I can add bwa and hmm in the future, but now I have no time to do this.
 
 Clone & Compile
 ---------------
