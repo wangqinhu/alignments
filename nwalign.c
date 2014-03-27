@@ -1,4 +1,4 @@
-/*  Smith-Waterman alignment
+/*  Needleman-Wunsch alignment
  *
  *  Wang, Qinhu
  *  Northwest A&F University
