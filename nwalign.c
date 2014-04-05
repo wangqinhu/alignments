@@ -309,7 +309,7 @@ void print_align (char aln1[], char aln2[], char aln[]) {
 		} else {
 			k = m % 50;
 		}
-		// print seqs/aliment
+		// print seqs/alignment
 		// seq1
 		for ( j = 0; j < k; j++ ) {
 			printf("%c", aln1[i+j]);
